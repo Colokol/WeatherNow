@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   uuid = "17C57DB8-D256-4059-8E34-43B94891F986"
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "839F52A5-75CC-4570-ABF4-43B590293ABE"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
+            landmarkName = "searchResultDidTap(city:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "839F52A5-75CC-4570-ABF4-43B590293ABE - 442589a124662ff9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in WeatherNow.ViewController.searchResultDidTap(city: Swift.String) -&gt; ()"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/ViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "142"
+                  endingLineNumber = "142"
+                  offsetFromSymbolStart = "460">
+               </Location>
+               <Location
+                  uuid = "839F52A5-75CC-4570-ABF4-43B590293ABE - 442589a124662ff9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 @Swift.MainActor () -&gt; () in WeatherNow.ViewController.searchResultDidTap(city: Swift.String) -&gt; ()"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/ViewController.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "142"
+                  endingLineNumber = "142"
+                  offsetFromSymbolStart = "60">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C1C374D7-94E8-4297-A55C-F668DBC16D02"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
+            landmarkName = "searchBarCancelButtonClicked(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1272B9F2-4679-48F2-BC77-BB449AFBD13D"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "166"
+            endingLineNumber = "166"
+            landmarkName = "searchResultDidTap(city:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/WeatherAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
+            landmarkName = "fetchHourWeather(lon:lat:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425 - e0492ca3305bb7a1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "WeatherNow.WeatherAPI.fetchHourWeather(lon: Swift.String, lat: Swift.String) -&gt; Combine.AnyPublisher&lt;WeatherNow.WeatherHourModel, Swift.Never&gt;"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/WeatherAPI.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41"
+                  offsetFromSymbolStart = "1364">
+               </Location>
+               <Location
+                  uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425 - 9902deb7fe563b2a"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (Swift.Error) -&gt; Combine.Just&lt;WeatherNow.WeatherHourModel&gt; in WeatherNow.WeatherAPI.fetchHourWeather(lon: Swift.String, lat: Swift.String) -&gt; Combine.AnyPublisher&lt;WeatherNow.WeatherHourModel, Swift.Never&gt;"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/WeatherAPI.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41"
+                  offsetFromSymbolStart = "36">
+               </Location>
+               <Location
+                  uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425 - e0492ca3305bb7a1"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "WeatherNow.WeatherAPI.fetchHourWeather(lon: Swift.String, lat: Swift.String) -&gt; Combine.AnyPublisher&lt;WeatherNow.WeatherHourModel, Swift.Never&gt;"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/WeatherAPI.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "41"
+                  endingLineNumber = "41"
+                  offsetFromSymbolStart = "1356">
+               </Location>
+               <Location
+                  uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425 - e0492ca3305bb73e"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "WeatherNow.WeatherAPI.fetchHourWeather(lon: Swift.String, lat: Swift.String) -&gt; Combine.AnyPublisher&lt;WeatherNow.WeatherHourModel, Swift.Never&gt;"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/WeatherAPI.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "44"
+                  endingLineNumber = "44"
+                  offsetFromSymbolStart = "1124">
+               </Location>
+               <Location
+                  uuid = "7B0943F1-1807-40FF-AF6D-357CF9241425 - 9902deb7fe563bb5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #2 (Swift.Error) -&gt; Combine.Just&lt;WeatherNow.WeatherHourModel&gt; in WeatherNow.WeatherAPI.fetchHourWeather(lon: Swift.String, lat: Swift.String) -&gt; Combine.AnyPublisher&lt;WeatherNow.WeatherHourModel, Swift.Never&gt;"
+                  moduleName = "WeatherNow"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/user/Documents/ProjectTL/WeatherNow/WeatherNow/WeatherAPI.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "44"
+                  endingLineNumber = "44"
+                  offsetFromSymbolStart = "40">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6CD42ECB-D5FD-41D9-A17D-87BF96B14986"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/View/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "127"
+            endingLineNumber = "127"
+            landmarkName = "binding()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "26311AFE-7566-409A-B2C3-C45CAD13A703"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/View/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "124"
+            endingLineNumber = "124"
+            landmarkName = "binding()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "68D3136B-6DD4-41F1-87F5-45A6EA56BC68"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/View/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
+            landmarkName = "binding()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6DE0FE33-5506-42DE-9897-F9D1E0775F45"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/WeatherAPI.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "URLHourWeather(lon:lat:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0F0BB470-9433-4FB9-AF84-EE32E8E7538C"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/View/Cell/WeatherDayCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
+            landmarkName = "configureTemp(model:indexPath:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B79F325A-2193-412B-851B-48959C71C449"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "WeatherNow/View/ViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "217"
+            endingLineNumber = "217"
+            landmarkName = "tableView(_:cellForRowAt:)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
