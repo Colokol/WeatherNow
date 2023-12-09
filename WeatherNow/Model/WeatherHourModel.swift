@@ -20,13 +20,7 @@ struct WeatherHourModel: Codable {
         return WeatherHourModel(lat: 0, lon: 0, timezone: "", timezoneOffset: 0, current: nil, minutely: [], hourly: [], daily: [])
     }
 
-    static var placeholder1: Self {
-        return WeatherHourModel(lat: 0, lon: 0, timezone: "1", timezoneOffset: 0, current: nil, minutely: [], hourly: [], daily: [])
-    }
-    static var placeholder2: Self {
-        return WeatherHourModel(lat: 0, lon: 0, timezone: "2", timezoneOffset: 0, current: nil, minutely: [], hourly: [], daily: [])
-    }
-
+    
     enum CodingKeys: String, CodingKey {
         case lat = "lat"
         case lon = "lon"

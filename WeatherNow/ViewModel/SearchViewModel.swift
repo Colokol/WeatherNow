@@ -10,23 +10,37 @@ import Foundation
 
 final class SearchViewModel: ObservableObject {
         // input
-    @Published var city: String = ""
+    @Published var city: String
         // output
-    @Published var currentWeather = WeatherDetail.placeholder
-    @Published var hoursWeather = WeatherHourModel.placeholder
+    @Published var currentWeather1 = WeatherDetail.placeholder
+    @Published var hoursWeather1 = WeatherHourModel.placeholder
+
+    init(city:String) {
+        self.city = city
+
+        WeatherAPI.shared.fetchWeather(for: city)
+            .assign(to: \.currentWeather1 , on: self)
+            .store(in: &self.cancellableSet)
+
+        $currentWeather1
+            .sink { weather in
+
+            }
+            .store(in: &self.cancellableSet)
+    }
 
     func locationWeather(lon: Double, lat: Double) {
-        WeatherAPI.shared.fetchHourWeather(lon: lon, lat: lat)
-            .assign(to: \.hoursWeather, on: self)
+        WeatherAPI.shared.fetchWeather(lon: lon, lat: lat)
+            .assign(to: \.hoursWeather1, on: self)
             .store(in: &self.cancellableSet)
     }
 
     func fetchCityWeather(city:String){
         
         WeatherAPI.shared.fetchWeather(for: city)
-            .assign(to: \.currentWeather , on: self)
+            .assign(to: \.currentWeather1 , on: self)
             .store(in: &self.cancellableSet)
-        $currentWeather
+        $currentWeather1
             .sink { weather in
                 let lon = weather.coord.lon
                 let lat = weather.coord.lat

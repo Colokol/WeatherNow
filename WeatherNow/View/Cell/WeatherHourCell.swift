@@ -34,7 +34,7 @@ class WeatherHourCell: UICollectionViewCell {
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
-        image.image = UIImage(named: "background")
+        image.tintColor = .black
         return image
     }()
 

@@ -18,6 +18,8 @@ class SearchResultViewController: UIViewController {
 
         var weather: WeatherHourModel = WeatherHourModel.placeholder
 
+        var viewModel: SearchViewModel?
+
         private let tempLabel: UILabel = {
             let label = UILabel()
             label.font = .systemFont(ofSize: 90)
@@ -54,7 +56,6 @@ class SearchResultViewController: UIViewController {
             return image
         }()
 
-        var viewModel = SearchViewModel()
 
         var hourCollectionView: UICollectionView = {
             let layout = UICollectionViewFlowLayout()
@@ -86,62 +87,65 @@ class SearchResultViewController: UIViewController {
 
         private var cancellable = Set<AnyCancellable>()
 
-        override func viewDidLoad() {
-            super.viewDidLoad()
+    override func viewDidLoad() {
+        super.viewDidLoad()
 
-            hourCollectionView.delegate = self
-            hourCollectionView.dataSource = self
+        hourCollectionView.delegate = self
+        hourCollectionView.dataSource = self
 
-            daysTempTableView.delegate = self
-            daysTempTableView.dataSource = self
+        daysTempTableView.delegate = self
+        daysTempTableView.dataSource = self
 
-            view.backgroundColor = .white
+        view.backgroundColor = .white
 
-            view.addSubview(backgroundImageView)
-            view.addSubview(hourCollectionView)
-            view.addSubview(daysTempTableView)
-            view.addSubview(tempLabel)
-            view.addSubview(cityLabel)
-            view.addSubview(weatherImageView)
-            setConstrains()
+        view.addSubview(backgroundImageView)
+        view.addSubview(hourCollectionView)
+        view.addSubview(daysTempTableView)
+        view.addSubview(tempLabel)
+        view.addSubview(cityLabel)
+        view.addSubview(weatherImageView)
+        setConstrains()
 
-            binding()
-        }
+        binding()
+    }
 
-        func binding() {
-            viewModel.$currentWeather
-                .sink(receiveValue: { [weak self] currentWeather in
-                    guard let self = self else { return }
-                    self.cityLabel.text = currentWeather.name
-                    if let temp = currentWeather.main?.temp {
+    func binding() {
+        viewModel?.$currentWeather1
+            .sink(receiveValue: { [weak self] currentWeather in
+                guard let self = self else { return }
+
+                self.cityLabel.text = currentWeather.name
+                if let temp = currentWeather.main?.temp {
+                    self.tempLabel.text = "\(Int(temp)) ºC"
+                } else {
+                    self.tempLabel.text = ""
+                }
+                self.weatherImageView.image = UIImage(systemName:  currentWeather.weatherImageName)
+            })
+            .store(in: &cancellable)
+
+        viewModel?.$hoursWeather1
+            .sink(receiveValue: { [weak self] weather in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+
+                    if let index = weather.timezone.range(of: "/")?.lowerBound {
+                        let result = weather.timezone.suffix(from: index).dropFirst()
+                        self.cityLabel.text = "\(result)"
+
+                    }
+                    if let temp = weather.current?.temp{
                         self.tempLabel.text = "\(Int(temp)) ºC"
-                    } else {
-                        self.tempLabel.text = ""
                     }
-                    self.weatherImageView.image = UIImage(systemName:  currentWeather.weatherImageName)
-                })
-                .store(in: &cancellable)
-
-            viewModel.$hoursWeather
-                .sink(receiveValue: { [weak self] weather in
-                    print(weather)
-
-                    guard let self = self else { return }
-//                    if let index = weather.timezone.range(of: "/")?.lowerBound {
-//                        let result = weather.timezone.suffix(from: index).dropFirst()
-//                        self.cityLabel.text = String(result)
-//                    }
-//                    if let temp = weather.current?.temp{
-//                        self.tempLabel.text = "\(Int(temp)) ºC"
-//                    }
-//                    self.weather = weather
-                    DispatchQueue.main.async {
-                        self.hourCollectionView.reloadData()
-                        self.daysTempTableView.reloadData()
-                    }
-                })
-                .store(in: &cancellable)
-        }
+                }
+                self.weather = weather
+                DispatchQueue.main.async {
+                    self.hourCollectionView.reloadData()
+                    self.daysTempTableView.reloadData()
+                }
+            })
+            .store(in: &cancellable)
+    }
 
         func setConstrains() {
             NSLayoutConstraint.activate([

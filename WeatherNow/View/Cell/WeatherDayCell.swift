@@ -34,6 +34,7 @@ class WeatherDayCell: UITableViewCell {
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
+        image.tintColor = .black
         return image
     }()
 

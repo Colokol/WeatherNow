@@ -9,13 +9,14 @@ import Combine
 import Foundation
 
 final class WeatherViewModel: ObservableObject {
-        // input
+
     @Published var city: String = ""
-        // output
     @Published var currentWeather = WeatherDetail.placeholder
     @Published var hoursWeather = WeatherHourModel.placeholder
     @Published var locationWeather = WeatherHourModel.placeholder
 
+    private var cancellableSet: Set<AnyCancellable> = []
+    
     init() {
 //        $city
 //            .debounce(for: 0.3, scheduler: RunLoop.main)
@@ -42,7 +43,7 @@ final class WeatherViewModel: ObservableObject {
     }
 
     func locationWeather(lon: Double, lat: Double) {
-        WeatherAPI.shared.fetchHourWeather(lon: lon, lat: lat)
+        WeatherAPI.shared.fetchWeather(lon: lon, lat: lat)
             .assign(to: \.hoursWeather, on: self)
             .store(in: &self.cancellableSet)
     }
@@ -55,11 +56,10 @@ final class WeatherViewModel: ObservableObject {
             .sink { weather in
                 let lon = weather.coord.lon
                 let lat = weather.coord.lat
-                self.locationWeather(lon: lon, lat: lat)
+//                locationWeather(lon: lon, lat: lat)
             }
             .store(in: &cancellableSet)
 
     }
 
-    private var cancellableSet: Set<AnyCancellable> = []
 }

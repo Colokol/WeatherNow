@@ -29,7 +29,15 @@ class ViewController: UIViewController {
         label.textAlignment = .center
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
+    private let oldWeatherLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 50)
+        label.textAlignment = .center
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
 
@@ -38,6 +46,7 @@ class ViewController: UIViewController {
         image.translatesAutoresizingMaskIntoConstraints = false
         image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
+        image.tintColor = .black
         return image
     }()
 
@@ -112,10 +121,12 @@ class ViewController: UIViewController {
         view.addSubview(tempLabel)
         view.addSubview(cityLabel)
         view.addSubview(weatherImageView)
+        view.addSubview(oldWeatherLabel)
+
         setConstrains()
-        
         binding()
     }
+
 
     func binding() {
         viewModel.$currentWeather
@@ -135,12 +146,16 @@ class ViewController: UIViewController {
         viewModel.$hoursWeather
             .sink(receiveValue: { [weak self] weather in
                 guard let self = self else { return }
-                if let index = weather.timezone.range(of: "/")?.lowerBound {
-                    let result = weather.timezone.suffix(from: index).dropFirst()
-                    self.cityLabel.text = String(result)
-                }
-                if let temp = weather.current?.temp{
-                    self.tempLabel.text = "\(Int(temp)) ºC"
+                DispatchQueue.main.async {
+                    
+                    if let index = weather.timezone.range(of: "/")?.lowerBound {
+                        let result = weather.timezone.suffix(from: index).dropFirst()
+                        self.cityLabel.text = "\(result)"
+                        
+                    }
+                    if let temp = weather.current?.temp{
+                        self.tempLabel.text = "\(Int(temp)) ºC"
+                    }
                 }
                 self.weather = weather
                 DispatchQueue.main.async {
@@ -189,7 +204,7 @@ extension ViewController: UISearchBarDelegate, SearchResultViewControllerDelegat
     func searchResultDidTap(city: String) {
         DispatchQueue.main.async { [self] in
             let viewController = SearchResultViewController()
-            viewController.viewModel.fetchCityWeather(city: city)
+            viewController.viewModel = SearchViewModel(city: city)
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
@@ -207,44 +222,9 @@ extension ViewController: UISearchBarDelegate, SearchResultViewControllerDelegat
 }
 
 
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        weather!.hourly.count > 6 ? 6: weather!.hourly.count
-    }
-
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeatherHourCell.identifier, for: indexPath) as? WeatherHourCell else {return UICollectionViewCell()}
 
 
-        let temp = String(Int(weather!.hourly[indexPath.row].temp)) + " ºC"
-        if indexPath.row == 0 {
-            cell.dayLabel.text = "Сейчас"
-        }else {
-            let currentDate = Date()
-            let calendar = Calendar.current
 
-            let hour = calendar.component(.hour, from: currentDate)
-            cell.dayLabel.text = "\(hour + indexPath.row)"
-        }
-
-        cell.temperatureLabel.text = temp
-        cell.weatherIconImageView.image = UIImage(systemName: "sun.min")
-        return cell
-    }
-}
-
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weather!.daily.count > 7 ? 7 : weather!.daily.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: WeatherDayCell.identifier) as? WeatherDayCell else {return UITableViewCell()}
-        cell.configureTemp(model: weather!.daily[indexPath.row], indexPath: indexPath.row)
-        cell.selectionStyle = .none
-        return cell
-    }
-}
 
 extension ViewController: CLLocationManagerDelegate{
 
@@ -252,10 +232,12 @@ extension ViewController: CLLocationManagerDelegate{
         guard let location = locations.last else {return}
         let lat = location.coordinate.latitude
         let lon = location.coordinate.longitude
+        print(lon,lat)
         viewModel.locationWeather(lon: lon, lat: lat)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print(error)
     }
+
 }
