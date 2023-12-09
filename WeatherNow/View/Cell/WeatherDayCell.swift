@@ -32,9 +32,8 @@ class WeatherDayCell: UITableViewCell {
     let weatherIconImageView: UIImageView = {
         let image = UIImageView()
         image.translatesAutoresizingMaskIntoConstraints = false
-        image.contentMode = .scaleAspectFill
+        image.contentMode = .scaleAspectFit
         image.clipsToBounds = true
-        image.image = UIImage(named: "background")
         return image
     }()
 
@@ -52,7 +51,7 @@ class WeatherDayCell: UITableViewCell {
     func setupStackView() {
         let horizontalStackView = UIStackView(arrangedSubviews: [dayLabel,weatherIconImageView,temperatureLabel,])
         horizontalStackView.axis = .horizontal
-        horizontalStackView.distribution = .fillProportionally
+        horizontalStackView.distribution = .equalSpacing
         horizontalStackView.spacing = 30
         horizontalStackView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -65,7 +64,8 @@ class WeatherDayCell: UITableViewCell {
             horizontalStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             weatherIconImageView.widthAnchor.constraint(equalToConstant: 50),
-            dayLabel.widthAnchor.constraint(equalToConstant: 60)
+            dayLabel.widthAnchor.constraint(equalToConstant: 60),
+            temperatureLabel.widthAnchor.constraint(equalToConstant: 100)
         ])
     }
 
@@ -77,7 +77,6 @@ class WeatherDayCell: UITableViewCell {
 
             let calendar = Calendar.current
             if let Weekday = calendar.date(byAdding: .day, value: indexPath, to: currentDate) {
-                let dayOfWeek = calendar.component(.weekday, from: Weekday)
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "EE"
                 let DayOfWeekString = dateFormatter.string(from: Weekday)
@@ -87,6 +86,7 @@ class WeatherDayCell: UITableViewCell {
         }
         let minTemp = "\(Int(model.temp.min)) ... \(Int(model.temp.max))" + " ºC"
         temperatureLabel.text = minTemp
+        weatherIconImageView.image = UIImage(systemName: "sun.max")
     }
 
 

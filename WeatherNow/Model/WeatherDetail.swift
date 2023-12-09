@@ -9,7 +9,7 @@ import Foundation
 
     // MARK: - WeatherDetail
 struct WeatherDetail: Codable, Identifiable {
-    let coord: Coord?
+    let coord: Coord
     let weather: [Weather]?
     let base: String?
     let main: Main?
@@ -23,15 +23,40 @@ struct WeatherDetail: Codable, Identifiable {
     let cod: Int?
 
     static var placeholder: Self {
-        return WeatherDetail(coord: nil, weather: nil, base: nil, main: nil,
+        return WeatherDetail(coord: Coord(lon: 1, lat: 1), weather: [], base: nil, main: nil,
                              visibility: nil, wind: nil, clouds: nil, dt: nil,
                              sys: nil, id: nil, name: nil, cod: nil)
+    }
+
+    var weatherImageName: String {
+        guard let firstWeather = weather?.first else {
+            return "defaultImageName"
+        }
+        let id = firstWeather.id
+        switch id {
+            case 200...232:
+                return "cloud.bolt"
+            case 300...321:
+                return "cloud.drizzle"
+            case 500...531:
+                return "cloud.rain"
+            case 600...622:
+                return "cloud.snow"
+            case 701...781:
+                return "cloud.fog"
+            case 800:
+                return "sun.max"
+            case 801...804:
+                return "cloud.bolt"
+            default:
+                return "cloud"
+        }
     }
 }
 
     // MARK: - Coord
 struct Coord: Codable {
-    let lon, lat: Double?
+    let lon, lat: Double
 }
 
     // MARK: - Main
@@ -57,7 +82,7 @@ struct Sys: Codable {
 
     // MARK: - Weather
 struct Weather: Codable {
-    let id: Int?
+    let id: Int
     let main, description, icon: String?
 }
     // MARK: - Clouds

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CE5371872B244CFD00E9CB62 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5371862B244CFD00E9CB62 /* SearchViewModel.swift */; };
 		CEB1DBF12B21B558004DCEF6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1DBF02B21B558004DCEF6 /* AppDelegate.swift */; };
 		CEB1DBF32B21B558004DCEF6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1DBF22B21B558004DCEF6 /* SceneDelegate.swift */; };
 		CEB1DBF52B21B558004DCEF6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEB1DBF42B21B558004DCEF6 /* ViewController.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CE5371862B244CFD00E9CB62 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
 		CEB1DBED2B21B558004DCEF6 /* WeatherNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEB1DBF02B21B558004DCEF6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEB1DBF22B21B558004DCEF6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 			isa = PBXGroup;
 			children = (
 				CEB1DC072B21BA5D004DCEF6 /* WeatherViewModel.swift */,
+				CE5371862B244CFD00E9CB62 /* SearchViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -207,6 +210,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE5371872B244CFD00E9CB62 /* SearchViewModel.swift in Sources */,
 				CEB1DC082B21BA5D004DCEF6 /* WeatherViewModel.swift in Sources */,
 				CEB1DC0C2B21C357004DCEF6 /* SearchResultViewController.swift in Sources */,
 				CEB1DC0E2B21D844004DCEF6 /* WeatherHourCell.swift in Sources */,

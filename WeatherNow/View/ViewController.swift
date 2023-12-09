@@ -7,10 +7,12 @@
 
 import UIKit
 import Combine
+import CoreLocation
 
 class ViewController: UIViewController {
 
-    var weather: WeatherHourModel = WeatherHourModel.placeholder
+    var weather: WeatherHourModel?
+    let locationManager = CLLocationManager()
 
     private let tempLabel: UILabel = {
         let label = UILabel()
@@ -31,12 +33,12 @@ class ViewController: UIViewController {
         return label
     }()
 
-    private let Label: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 90)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    let weatherImageView: UIImageView = {
+        let image = UIImageView()
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.contentMode = .scaleAspectFit
+        image.clipsToBounds = true
+        return image
     }()
 
     private let backgroundImageView: UIImageView = {
@@ -54,12 +56,14 @@ class ViewController: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 5
         layout.minimumInteritemSpacing = 5
-        layout.itemSize = CGSize(width: UIScreen.main.bounds.width / 6 - 5 , height: (UIScreen.main.bounds.height - 50) / 4.5)
+        layout.itemSize = CGSize(width: (UIScreen.main.bounds.width - 40) / 6 - 5 , height: 100)
         layout.scrollDirection = .horizontal
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collection.register(WeatherHourCell.self, forCellWithReuseIdentifier: WeatherHourCell.identifier)
         collection.translatesAutoresizingMaskIntoConstraints = false
-        collection.backgroundColor = .clear
+        collection.backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 85/255, alpha: 0.3)
+        collection.layer.cornerRadius = 10
+        collection.clipsToBounds = true
         return collection
     }()
 
@@ -70,15 +74,16 @@ class ViewController: UIViewController {
         table.backgroundColor = .clear
         table.layer.cornerRadius = 10
         table.clipsToBounds = true
+        table.showsHorizontalScrollIndicator = false
         return table
     }()
 
     private let searchControler: UISearchController = {
-        let search = UISearchController(searchResultsController: SearchResultViewController())
+        let search = UISearchController()
         search.searchBar.placeholder = "Search"
         search.searchBar.tintColor = .black
+        search.definesPresentationContext = false
         return search
-        
     }()
 
     private var cancellable = Set<AnyCancellable>()
@@ -87,7 +92,10 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.searchController = searchControler
 
-        print(viewModel.hoursWeather)
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+
         searchControler.searchBar.delegate = self
 
         hourCollectionView.delegate = self
@@ -103,6 +111,7 @@ class ViewController: UIViewController {
         view.addSubview(daysTempTableView)
         view.addSubview(tempLabel)
         view.addSubview(cityLabel)
+        view.addSubview(weatherImageView)
         setConstrains()
         
         binding()
@@ -110,22 +119,33 @@ class ViewController: UIViewController {
 
     func binding() {
         viewModel.$currentWeather
-            .sink(receiveValue: {[weak self] currentWeather in
-                self?.cityLabel.text = currentWeather.name
-                self?.tempLabel.text =
-                currentWeather.main?.temp != nil ?
-                "\(Int((currentWeather.main?.temp!)!)) ºC"
-                : " "}
-            )
+            .sink(receiveValue: { [weak self] currentWeather in
+                guard let self = self else { return }
+
+                self.cityLabel.text = currentWeather.name
+                if let temp = currentWeather.main?.temp {
+                    self.tempLabel.text = "\(Int(temp)) ºC"
+                } else {
+                    self.tempLabel.text = ""
+                }
+                self.weatherImageView.image = UIImage(systemName:  currentWeather.weatherImageName)
+            })
             .store(in: &cancellable)
 
         viewModel.$hoursWeather
             .sink(receiveValue: { [weak self] weather in
-                self?.weather = weather
-                print(weather)
+                guard let self = self else { return }
+                if let index = weather.timezone.range(of: "/")?.lowerBound {
+                    let result = weather.timezone.suffix(from: index).dropFirst()
+                    self.cityLabel.text = String(result)
+                }
+                if let temp = weather.current?.temp{
+                    self.tempLabel.text = "\(Int(temp)) ºC"
+                }
+                self.weather = weather
                 DispatchQueue.main.async {
-                    self?.hourCollectionView.reloadData()
-                    self?.daysTempTableView.reloadData()
+                    self.hourCollectionView.reloadData()
+                    self.daysTempTableView.reloadData()
                 }
             })
             .store(in: &cancellable)
@@ -145,27 +165,31 @@ class ViewController: UIViewController {
             tempLabel.topAnchor.constraint(equalTo: cityLabel.bottomAnchor, constant: 10),
             tempLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
+            weatherImageView.centerYAnchor.constraint(equalTo: tempLabel.centerYAnchor),
+            weatherImageView.leadingAnchor.constraint(equalTo: tempLabel.trailingAnchor, constant: 5),
+            weatherImageView.heightAnchor.constraint(equalToConstant: 50),
+            weatherImageView.widthAnchor.constraint(equalToConstant: 50),
+
             hourCollectionView.topAnchor.constraint(equalTo: tempLabel.bottomAnchor),
-            hourCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hourCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hourCollectionView.heightAnchor.constraint(equalToConstant: 150),
+            hourCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            hourCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            hourCollectionView.heightAnchor.constraint(equalToConstant: 100),
 
             daysTempTableView.topAnchor.constraint(equalTo: hourCollectionView.bottomAnchor, constant: 10),
             daysTempTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            daysTempTableView.leadingAnchor.constraint(equalTo: hourCollectionView.leadingAnchor, constant: 20),
-            daysTempTableView.trailingAnchor.constraint(equalTo: hourCollectionView.trailingAnchor, constant: -20),
+            daysTempTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            daysTempTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
         ])
     }
 }
 
 
-extension ViewController: UISearchBarDelegate,SearchResultViewControllerDelegate {
+extension ViewController: UISearchBarDelegate, SearchResultViewControllerDelegate {
 
     func searchResultDidTap(city: String) {
-        viewModel.city = city
         DispatchQueue.main.async { [self] in
-            let viewController = ViewController()
-            viewController.viewModel = self.viewModel
+            let viewController = SearchResultViewController()
+            viewController.viewModel.fetchCityWeather(city: city)
             self.navigationController?.pushViewController(viewController, animated: true)
         }
     }
@@ -176,8 +200,8 @@ extension ViewController: UISearchBarDelegate,SearchResultViewControllerDelegate
     }
 
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.text = "London"
-        searchResultDidTap(city: searchBar.text!)
+        searchBar.text = ""
+       // searchResultDidTap(city: searchBar.text!)
     }
 
 }
@@ -185,12 +209,14 @@ extension ViewController: UISearchBarDelegate,SearchResultViewControllerDelegate
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        weather.hourly.count > 6 ? 6: weather.hourly.count
+        weather!.hourly.count > 6 ? 6: weather!.hourly.count
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeatherHourCell.identifier, for: indexPath) as? WeatherHourCell else {return UICollectionViewCell()}
-        let temp = String(Int(weather.hourly[indexPath.row].temp)) + " ºC"
+
+
+        let temp = String(Int(weather!.hourly[indexPath.row].temp)) + " ºC"
         if indexPath.row == 0 {
             cell.dayLabel.text = "Сейчас"
         }else {
@@ -209,14 +235,27 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        weather.daily.count > 7 ? 7 : weather.daily.count
+        weather!.daily.count > 7 ? 7 : weather!.daily.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: WeatherDayCell.identifier) as? WeatherDayCell else {return UITableViewCell()}
-        cell.configureTemp(model: weather.daily[indexPath.row], indexPath: indexPath.row)
+        cell.configureTemp(model: weather!.daily[indexPath.row], indexPath: indexPath.row)
+        cell.selectionStyle = .none
         return cell
     }
+}
 
+extension ViewController: CLLocationManagerDelegate{
 
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else {return}
+        let lat = location.coordinate.latitude
+        let lon = location.coordinate.longitude
+        viewModel.locationWeather(lon: lon, lat: lat)
+    }
+
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+    }
 }

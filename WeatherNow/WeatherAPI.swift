@@ -7,7 +7,7 @@
 
 import Foundation
 import Combine
-import UIKit
+import Network
 
 class WeatherAPI {
     static let shared = WeatherAPI()
@@ -20,28 +20,43 @@ class WeatherAPI {
         return "metric"
     }
 
-     func URLHourWeather(lon:String, lat:String) -> URL?  {
+    private let cache = URLCache.shared
+    private let monitor = NWPathMonitor()
+
+    init() {
+        monitor.pathUpdateHandler = { [weak self] path in
+            self?.handleNetworkUpdate(path: path)
+        }
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        monitor.start(queue: queue)
+    }
+
+    private var isNetworkAvailable: Bool {
+        return monitor.currentPath.status == .satisfied
+    }
+
+     func URLHourWeather(lon:Double, lat:Double) -> URL?  {
 
         let queryURL = Foundation.URL(string: baseaseURL3)!
         let components = URLComponents(url: queryURL, resolvingAgainstBaseURL: true)
         guard var urlComponents = components else { return nil }
         urlComponents.queryItems = [URLQueryItem(name: "appid", value: apiKey),
-                                    URLQueryItem(name: "lat", value: lat),
-                                    URLQueryItem(name: "lon", value: lon),
+                                    URLQueryItem(name: "lat", value: "\(lat)"),
+                                    URLQueryItem(name: "lon", value: "\(lon)"),
                                     URLQueryItem(name: "units", value: units) ]
          return urlComponents.url
     }
 
-    func fetchHourWeather(lon:String,lat:String) -> AnyPublisher<WeatherHourModel, Never> {
+    func fetchHourWeather(lon:Double,lat:Double) -> AnyPublisher<WeatherHourModel, Never> {
         guard let url = URLHourWeather(lon: lon, lat: lat) else {
-            return Just(WeatherHourModel.placeholder)
+            return Just(WeatherHourModel.placeholder1)
                 .eraseToAnyPublisher()
         }
         print(url)
         return URLSession.shared.dataTaskPublisher(for:url)
             .map { $0.data }
             .decode(type: WeatherHourModel.self, decoder: JSONDecoder())
-            .catch { error in Just(WeatherHourModel.placeholder)}
+            .catch { error in Just(WeatherHourModel.placeholder2)}
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
@@ -70,6 +85,12 @@ class WeatherAPI {
             .eraseToAnyPublisher()
     }
 
-
+    private func handleNetworkUpdate(path: NWPath) {
+        if path.status == .satisfied {
+            print("Network is available")
+        } else {
+            print("Network is not available")
+        }
+    }
 
 }
