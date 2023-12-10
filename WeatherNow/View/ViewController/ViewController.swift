@@ -1,9 +1,9 @@
-//
-//  ViewController.swift
-//  WeatherNow
-//
-//  Created by Uladzislau Yatskevich on 7.12.23.
-//
+    //
+    //  ViewController.swift
+    //  WeatherNow
+    //
+    //  Created by Uladzislau Yatskevich on 7.12.23.
+    //
 
 import UIKit
 import Combine
@@ -112,7 +112,7 @@ class ViewController: UIViewController {
 
         daysTempTableView.delegate = self
         daysTempTableView.dataSource = self
-        
+
         view.backgroundColor = .white
 
         view.addSubview(backgroundImageView)
@@ -129,20 +129,6 @@ class ViewController: UIViewController {
 
 
     func binding() {
-//        viewModel.$currentWeather
-//            .sink(receiveValue: { [weak self] currentWeather in
-//                guard let self = self else { return }
-//
-//                self.cityLabel.text = currentWeather.name
-//                if let temp = currentWeather.main?.temp {
-//                    self.tempLabel.text = "\(Int(temp)) ºC"
-//                } else {
-//                    self.tempLabel.text = ""
-//                }
-//                self.weatherImageView.image = UIImage(systemName:  currentWeather.weatherImageName)
-//            })
-//            .store(in: &cancellable)
-
         viewModel.$hoursWeather
             .sink(receiveValue: { [weak self] weather in
                 guard let self = self else { return }
@@ -233,3 +219,5 @@ extension ViewController: CLLocationManagerDelegate{
     }
 
 }
+
+

@@ -35,7 +35,6 @@ final class WeatherViewModel: ObservableObject {
                 guard let city = weather.name else {return}
                 self.city = city
                 self.saveNameCity(name: city)
-                print(city)
             }
             .store(in: &self.cancellableSet)
     }
