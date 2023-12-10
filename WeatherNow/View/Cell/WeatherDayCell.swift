@@ -40,8 +40,7 @@ class WeatherDayCell: UITableViewCell {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 85/255, alpha: 0.3)
-
+        backgroundColor = .clear
         setupStackView()
     }
 
@@ -87,7 +86,9 @@ class WeatherDayCell: UITableViewCell {
         }
         let minTemp = "\(Int(model.temp.min)) ... \(Int(model.temp.max))" + " ºC"
         temperatureLabel.text = minTemp
-        weatherIconImageView.image = UIImage(systemName: "sun.max")
+        guard let imageId = model.weather.first else {return}
+        let image = WeatherHourModel.getWeatherIcon(weather: imageId)
+        weatherIconImageView.image = UIImage(named: image)
     }
 
 

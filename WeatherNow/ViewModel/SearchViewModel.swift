@@ -9,23 +9,27 @@ import Combine
 import Foundation
 
 final class SearchViewModel: ObservableObject {
-        // input
+
     @Published var city: String
-        // output
     @Published var currentWeather1 = WeatherDetail.placeholder
     @Published var hoursWeather1 = WeatherHourModel.placeholder
 
+    var weather : WeatherDetail?
+
+    private var cancellableSet: Set<AnyCancellable> = []
+
     init(city:String) {
         self.city = city
-
         WeatherAPI.shared.fetchWeather(for: city)
-            .assign(to: \.currentWeather1 , on: self)
-            .store(in: &self.cancellableSet)
-
-        $currentWeather1
-            .sink { weather in
-
-            }
+            .sink(receiveValue: { weather in
+                self.weather = weather
+                if let cityName = weather.name {
+                    self.city = cityName
+                }else {
+                    self.city = "Неверный город"
+                }
+                self.locationWeather(lon: weather.coord.lon, lat: weather.coord.lat)
+            })
             .store(in: &self.cancellableSet)
     }
 
@@ -50,5 +54,4 @@ final class SearchViewModel: ObservableObject {
 
     }
 
-    private var cancellableSet: Set<AnyCancellable> = []
 }

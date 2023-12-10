@@ -80,11 +80,6 @@ struct Sys: Codable {
     let sunrise, sunset: TimeInterval?//Int?
 }
 
-    // MARK: - Weather
-struct Weather: Codable {
-    let id: Int
-    let main, description, icon: String?
-}
     // MARK: - Clouds
 struct Clouds: Codable {
     let all: Int?

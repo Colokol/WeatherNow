@@ -12,13 +12,14 @@ protocol SearchResultViewControllerDelegate {
     func searchResultDidTap(city:String)
 }
 
-
-
 class SearchResultViewController: UIViewController {
 
         var weather: WeatherHourModel = WeatherHourModel.placeholder
 
         var viewModel: SearchViewModel?
+
+
+        private var cancellable = Set<AnyCancellable>()
 
         private let tempLabel: UILabel = {
             let label = UILabel()
@@ -44,6 +45,7 @@ class SearchResultViewController: UIViewController {
             image.translatesAutoresizingMaskIntoConstraints = false
             image.contentMode = .scaleAspectFit
             image.clipsToBounds = true
+            image.tintColor = .black
             return image
         }()
 
@@ -56,7 +58,6 @@ class SearchResultViewController: UIViewController {
             return image
         }()
 
-
         var hourCollectionView: UICollectionView = {
             let layout = UICollectionViewFlowLayout()
             layout.minimumLineSpacing = 5
@@ -66,7 +67,7 @@ class SearchResultViewController: UIViewController {
             let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
             collection.register(WeatherHourCell.self, forCellWithReuseIdentifier: WeatherHourCell.identifier)
             collection.translatesAutoresizingMaskIntoConstraints = false
-            collection.backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 85/255, alpha: 0.3)
+            collection.backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 85/255, alpha: 0.1)
             collection.layer.cornerRadius = 10
             collection.clipsToBounds = true
             return collection
@@ -76,16 +77,12 @@ class SearchResultViewController: UIViewController {
             let table = UITableView()
             table.translatesAutoresizingMaskIntoConstraints = false
             table.register(WeatherDayCell.self, forCellReuseIdentifier: WeatherDayCell.identifier)
-            table.backgroundColor = .clear
+            table.backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 85/255, alpha: 0.1)
             table.layer.cornerRadius = 10
             table.clipsToBounds = true
             table.showsHorizontalScrollIndicator = false
             return table
         }()
-
-
-
-        private var cancellable = Set<AnyCancellable>()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -110,33 +107,19 @@ class SearchResultViewController: UIViewController {
     }
 
     func binding() {
-        viewModel?.$currentWeather1
-            .sink(receiveValue: { [weak self] currentWeather in
-                guard let self = self else { return }
-
-                self.cityLabel.text = currentWeather.name
-                if let temp = currentWeather.main?.temp {
-                    self.tempLabel.text = "\(Int(temp)) ºC"
-                } else {
-                    self.tempLabel.text = ""
-                }
-                self.weatherImageView.image = UIImage(systemName:  currentWeather.weatherImageName)
-            })
-            .store(in: &cancellable)
 
         viewModel?.$hoursWeather1
             .sink(receiveValue: { [weak self] weather in
                 guard let self = self else { return }
                 DispatchQueue.main.async {
-
-                    if let index = weather.timezone.range(of: "/")?.lowerBound {
-                        let result = weather.timezone.suffix(from: index).dropFirst()
-                        self.cityLabel.text = "\(result)"
-
-                    }
                     if let temp = weather.current?.temp{
                         self.tempLabel.text = "\(Int(temp)) ºC"
                     }
+                    self.cityLabel.text = self.viewModel?.city
+                    guard let imageId = weather.current?.weather.first else {return}
+                    let image = WeatherHourModel.getWeatherIcon(weather: imageId)
+                    self.weatherImageView.image = UIImage(named: image )
+
                 }
                 self.weather = weather
                 DispatchQueue.main.async {
@@ -147,36 +130,36 @@ class SearchResultViewController: UIViewController {
             .store(in: &cancellable)
     }
 
-        func setConstrains() {
-            NSLayoutConstraint.activate([
-                backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-                backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
-                backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    func setConstrains() {
+        NSLayoutConstraint.activate([
+            backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            backgroundImageView.topAnchor.constraint(equalTo: view.topAnchor),
+            backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-                cityLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-                cityLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10),
-                cityLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: 10),
+            cityLabel.topAnchor.constraint(equalTo: weatherImageView.bottomAnchor, constant: 5),
+            cityLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 10),
+            cityLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor,constant: 10),
 
-                tempLabel.topAnchor.constraint(equalTo: cityLabel.bottomAnchor, constant: 10),
-                tempLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tempLabel.topAnchor.constraint(equalTo: cityLabel.bottomAnchor, constant: 10),
+            tempLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
 
-                weatherImageView.centerYAnchor.constraint(equalTo: tempLabel.centerYAnchor),
-                weatherImageView.leadingAnchor.constraint(equalTo: tempLabel.trailingAnchor, constant: 5),
-                weatherImageView.heightAnchor.constraint(equalToConstant: 50),
-                weatherImageView.widthAnchor.constraint(equalToConstant: 50),
+            weatherImageView.centerXAnchor.constraint(equalTo: tempLabel.centerXAnchor),
+            weatherImageView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+            weatherImageView.heightAnchor.constraint(equalToConstant: 90),
+            weatherImageView.widthAnchor.constraint(equalToConstant: 90),
 
-                hourCollectionView.topAnchor.constraint(equalTo: tempLabel.bottomAnchor),
-                hourCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
-                hourCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-                hourCollectionView.heightAnchor.constraint(equalToConstant: 100),
+            hourCollectionView.topAnchor.constraint(equalTo: tempLabel.bottomAnchor),
+            hourCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor,constant: 20),
+            hourCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            hourCollectionView.heightAnchor.constraint(equalToConstant: 100),
 
-                daysTempTableView.topAnchor.constraint(equalTo: hourCollectionView.bottomAnchor, constant: 10),
-                daysTempTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                daysTempTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-                daysTempTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            ])
-        }
+            daysTempTableView.topAnchor.constraint(equalTo: hourCollectionView.bottomAnchor, constant: 10),
+            daysTempTableView.bottomAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor),
+            daysTempTableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            daysTempTableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+        ])
+    }
     }
 
 
@@ -188,21 +171,8 @@ class SearchResultViewController: UIViewController {
 
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: WeatherHourCell.identifier, for: indexPath) as? WeatherHourCell else {return UICollectionViewCell()}
-
-
-            let temp = String(Int(weather.hourly[indexPath.row].temp)) + " ºC"
-            if indexPath.row == 0 {
-                cell.dayLabel.text = "Сейчас"
-            }else {
-                let currentDate = Date()
-                let calendar = Calendar.current
-
-                let hour = calendar.component(.hour, from: currentDate)
-                cell.dayLabel.text = "\(hour + indexPath.row)"
-            }
-
-            cell.temperatureLabel.text = temp
-            cell.weatherIconImageView.image = UIImage(systemName: "sun.min")
+            let model = weather.hourly[indexPath.row]
+                cell.configureCell(model: model, indexPath: indexPath.row)
             return cell
         }
     }

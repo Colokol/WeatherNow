@@ -41,10 +41,29 @@ class WeatherHourCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        setupStackView()
+        setupView()
     }
 
-    func setupStackView() {
+    func configureCell(model:Hourly, indexPath:Int){
+
+        //let temp = String(Int(weather!.hourly[indexPath.row].temp)) + " ºC"
+        if indexPath == 0 {
+            dayLabel.text = "Сейчас"
+        }else {
+            let currentDate = Date()
+            let calendar = Calendar.current
+
+            let hour = calendar.component(.hour, from: currentDate)
+            dayLabel.text = "\(hour + indexPath)"
+        }
+        let temp = Int(model.temp)
+        temperatureLabel.text = "\(temp) ºC"
+        guard let imageId =  model.weather.first else {return}
+        let image = WeatherHourModel.getWeatherIcon(weather: imageId)
+        weatherIconImageView.image = UIImage(named: image)
+    }
+
+    func setupView() {
 
         contentView.addSubview(dayLabel)
         contentView.addSubview(weatherIconImageView)
@@ -66,6 +85,8 @@ class WeatherHourCell: UICollectionViewCell {
             temperatureLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
         ])
     }
+
+
 
     required init?(coder: NSCoder) {
         fatalError()
