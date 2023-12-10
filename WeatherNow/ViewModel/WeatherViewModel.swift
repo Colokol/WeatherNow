@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import Network
 
 final class WeatherViewModel: ObservableObject {
 
@@ -15,21 +16,49 @@ final class WeatherViewModel: ObservableObject {
     @Published var hoursWeather = WeatherHourModel.placeholder
     @Published var locationWeather = WeatherHourModel.placeholder
 
+
     private var cancellableSet: Set<AnyCancellable> = []
+    private let monitor = NWPathMonitor()
+    private var isNetworkAvailable: Bool {
+        return monitor.currentPath.status == .satisfied
+    }
+    var coordLon: Double = 0.0
+    var coordLat: Double = 0.0
     
     init() {
-        $hoursWeather
+
+        let queue = DispatchQueue(label: "NetworkMonitor")
+        monitor.start(queue: queue)
+
+        $currentWeather
             .sink { weather in
-                guard let city = self.extractCity(from: weather.timezone) else {return}
+                guard let city = weather.name else {return}
                 self.city = city
+                self.saveNameCity(name: city)
+                print(city)
             }
             .store(in: &self.cancellableSet)
     }
 
     func locationWeather(lon: Double, lat: Double) {
-        WeatherAPI.shared.fetchWeather(lon: lon, lat: lat)
-            .assign(to: \.hoursWeather, on: self)
-            .store(in: &self.cancellableSet)
+
+        if isNetworkAvailable {
+            WeatherAPI.shared.fetchLocalWeather(lon: lon, lat: lat)
+                .assign(to: \.hoursWeather, on: self)
+                .store(in: &self.cancellableSet)
+            WeatherAPI.shared.fetchDetailWeather(lon: lon, lat: lat)
+                .assign(to: \.currentWeather, on: self)
+                .store(in: &self.cancellableSet)
+        
+        }else {
+            if let cachedData = loadFromCache(key: "lastLocation"),
+               let cachedWeather = try? JSONDecoder().decode(WeatherHourModel.self, from: cachedData) {
+                hoursWeather = cachedWeather
+            }
+            if let city = UserDefaults.standard.object(forKey: "City"){
+                self.city = city as? String ?? ""
+            }
+        }
     }
 
 
@@ -44,6 +73,14 @@ final class WeatherViewModel: ObservableObject {
         } else {
             return "Неверный город"
         }
+    }
+
+    func saveNameCity(name:String, key:String = "City"){
+        UserDefaults.standard.set(name, forKey: key)
+    }
+
+    func loadFromCache(key: String) -> Data? {
+        return UserDefaults.standard.data(forKey: key)
     }
 
 }

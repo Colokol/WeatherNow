@@ -10,9 +10,10 @@ import Foundation
 import Combine
 import Network
 
+
 struct CachedWeatherHourModel {
     let data: Data
-    let expirationDate: Date
+    let lastSaveDate: Date
 }
 
 class WeatherAPI {
@@ -26,20 +27,15 @@ class WeatherAPI {
         return "metric"
     }
 
-    private var cache: [String: CachedWeatherHourModel] = [:]
-    private let monitor = NWPathMonitor()
-
-    init() {
-        monitor.pathUpdateHandler = { [weak self] path in
-            self?.handleNetworkUpdate(path: path)
+    private var lang:String {
+        guard let firstLanguageCode = Locale.preferredLanguages.first else {
+            return "en"
         }
-        let queue = DispatchQueue(label: "NetworkMonitor")
-        monitor.start(queue: queue)
+        let languageCode = firstLanguageCode.components(separatedBy: "-").first ?? firstLanguageCode
+        return languageCode
     }
 
-    private var isNetworkAvailable: Bool {
-        return monitor.currentPath.status == .satisfied
-    }
+    private var cache: [String: CachedWeatherHourModel] = [:]
 
     func URLHourWeather(lon:Double, lat:Double) -> URL?  {
 
@@ -49,7 +45,8 @@ class WeatherAPI {
         urlComponents.queryItems = [URLQueryItem(name: "appid", value: apiKey),
                                     URLQueryItem(name: "lat", value: "\(lat)"),
                                     URLQueryItem(name: "lon", value: "\(lon)"),
-                                    URLQueryItem(name: "units", value: units) ]
+                                    URLQueryItem(name: "units", value: units),
+                                    URLQueryItem(name: "lang", value: lang)]
         return urlComponents.url
     }
 
@@ -59,28 +56,29 @@ class WeatherAPI {
         guard var urlComponents = components else { return nil}
         urlComponents.queryItems = [URLQueryItem(name: "appid", value: apiKey),
                                     URLQueryItem(name: "q", value: city),
-                                    URLQueryItem(name: "units", value: "metric")]
+                                    URLQueryItem(name: "units", value: units),
+                                    URLQueryItem(name: "lang", value: lang)]
+        return urlComponents.url
+    }
+
+    private func URLWeather(lon: Double, lat: Double) -> URL? {
+        let queryURL = Foundation.URL(string: baseaseURL)!
+        let components = URLComponents(url: queryURL, resolvingAgainstBaseURL: true)
+        guard var urlComponents = components else { return nil}
+        urlComponents.queryItems = [URLQueryItem(name: "appid", value: apiKey),
+                                    URLQueryItem(name: "lon", value: "\(lon)"),
+                                    URLQueryItem(name: "lat", value: "\(lat)"),
+                                    URLQueryItem(name: "units", value: units),
+                                    URLQueryItem(name: "lang", value: lang)]
         return urlComponents.url
     }
 
     func fetchLocalWeather(lon: Double, lat: Double) -> AnyPublisher<WeatherHourModel, Never> {
-        guard isNetworkAvailable else {
-
-            if let cachedData = loadFromCache(key: "last"),
-               let cachedWeather = try? JSONDecoder().decode(WeatherHourModel.self, from: cachedData) {
-                return Just(cachedWeather)
-                    .eraseToAnyPublisher()
-            }
-
-            return Just(WeatherHourModel.placeholder)
-                .eraseToAnyPublisher()
-        }
 
         guard let url = URLHourWeather(lon: lon, lat: lat) else {
             return Just(WeatherHourModel.placeholder)
                 .eraseToAnyPublisher()
         }
-
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = ["Cache-Control": "no-store, max-age=0"]
 
@@ -96,7 +94,9 @@ class WeatherAPI {
             }
             .decode(type: WeatherHourModel.self, decoder: JSONDecoder())
             .handleEvents(receiveOutput: { [weak self] data in
-                self?.saveToCache(data: try! JSONEncoder().encode(data), key: "last")
+                let decodingData = try! JSONEncoder().encode(data)
+                let cacheData = CachedWeatherHourModel(data: decodingData, lastSaveDate: Date())
+                self?.saveToCache(data: cacheData, key: "lastLocation")
             })
             .catch { error in
                 print("Error fetching hour weather: \(error)")
@@ -105,12 +105,27 @@ class WeatherAPI {
             .eraseToAnyPublisher()
     }
 
+    func fetchDetailWeather(lon: Double, lat: Double) -> AnyPublisher<WeatherDetail, Never> {
+        guard let url = URLWeather(lon: lon, lat: lat) else {
+            return Just(WeatherDetail.placeholder)
+                .eraseToAnyPublisher()
+        }
+        return URLSession.shared.dataTaskPublisher(for:url)
+            .map { $0.data }
+            .decode(type: WeatherDetail.self, decoder: JSONDecoder())
+            .catch { error in
+                print("Error fetching hour weather: \(error)")
+                return Just(WeatherDetail.placeholder)
+            }
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+    }
+
     func fetchWeather(lon: Double, lat: Double) -> AnyPublisher<WeatherHourModel, Never> {
         guard let url = URLHourWeather(lon: lon, lat: lat) else {
             return Just(WeatherHourModel.placeholder)
                 .eraseToAnyPublisher()
         }
-        print(url)
         return URLSession.shared.dataTaskPublisher(for:url)
             .map { $0.data }
             .decode(type: WeatherHourModel.self, decoder: JSONDecoder())
@@ -121,6 +136,9 @@ class WeatherAPI {
             .receive(on: RunLoop.main)
             .eraseToAnyPublisher()
     }
+
+
+
 
     func fetchWeather(for city: String) -> AnyPublisher<WeatherDetail, Never> {
         guard let url = URLWeather(city: city) else {
@@ -135,21 +153,9 @@ class WeatherAPI {
             .eraseToAnyPublisher()
     }
 
-
-    private func handleNetworkUpdate(path: NWPath) {
-        if path.status == .satisfied {
-            print("Network is available")
-        } else {
-            print("Network is not available")
-        }
-    }
-
-    func saveToCache(data: Data, key: String) {
-        UserDefaults.standard.set(data, forKey: key)
-    }
-
-    func loadFromCache(key: String) -> Data? {
-        return UserDefaults.standard.data(forKey: key)
+    func saveToCache(data: CachedWeatherHourModel, key: String) {
+        UserDefaults.standard.set(data.data, forKey: key)
+        UserDefaults.standard.set(data.lastSaveDate, forKey: "\(key)Time")
     }
 
 }

@@ -12,12 +12,11 @@
         let timezone: String
         let timezoneOffset: Int
         let current: Current?
-        let minutely: [Minutely]
         let hourly: [Hourly]
         let daily: [Daily]
 
         static var placeholder: Self {
-            return WeatherHourModel(lat: 0, lon: 0, timezone: "", timezoneOffset: 0, current: nil , minutely: [], hourly: [], daily: [])
+            return WeatherHourModel(lat: 0, lon: 0, timezone: "", timezoneOffset: 0, current: nil , hourly: [], daily: [])
         }
 
         static func getWeatherIcon(weather:Weather) -> String {
@@ -48,7 +47,7 @@
             case timezone = "timezone"
             case timezoneOffset = "timezone_offset"
             case current = "current"
-            case minutely = "minutely"
+//            case minutely = "minutely"
             case hourly = "hourly"
             case daily = "daily"
         }
