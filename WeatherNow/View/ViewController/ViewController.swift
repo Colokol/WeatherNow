@@ -101,18 +101,13 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         navigationItem.searchController = searchControler
 
-        locationManager.delegate = self
-        locationManager.requestWhenInUseAuthorization()
-        locationManager.requestLocation()
+        fetchLocation()
+        setupDelegate()
+        setupView()
+        binding()
+    }
 
-        searchControler.searchBar.delegate = self
-
-        hourCollectionView.delegate = self
-        hourCollectionView.dataSource = self
-
-        daysTempTableView.delegate = self
-        daysTempTableView.dataSource = self
-
+    private func setupView() {
         view.backgroundColor = .white
 
         view.addSubview(backgroundImageView)
@@ -124,11 +119,19 @@ class ViewController: UIViewController {
         view.addSubview(oldWeatherLabel)
 
         setConstrains()
-        binding()
     }
 
+    private func setupDelegate() {
+        searchControler.searchBar.delegate = self
 
-    func binding() {
+        hourCollectionView.delegate = self
+        hourCollectionView.dataSource = self
+
+        daysTempTableView.delegate = self
+        daysTempTableView.dataSource = self
+    }
+
+    private func binding() {
         viewModel.$hoursWeather
             .sink(receiveValue: { [weak self] weather in
                 guard let self = self else { return }
@@ -151,7 +154,14 @@ class ViewController: UIViewController {
             .store(in: &cancellable)
     }
 
-    func setConstrains() {
+    private func fetchLocation() {
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.requestLocation()
+    }
+
+    // MARK: - Constraints
+    private func setConstrains() {
         NSLayoutConstraint.activate([
             backgroundImageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             backgroundImageView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -184,6 +194,7 @@ class ViewController: UIViewController {
 }
 
 
+// MARK: - SearchDelegate
 extension ViewController: UISearchBarDelegate, SearchResultViewControllerDelegate {
 
     func searchResultDidTap(city: String) {
